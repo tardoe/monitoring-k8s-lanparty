@@ -1,0 +1,133 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: librenms
+spec:
+  selector:
+    matchLabels:
+      app: librenms
+  serviceName: librenms
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: librenms
+    spec:
+      initContainers:
+      - name: init-librenmsdb
+        image: jarischaefer/docker-librenms:1.43
+        env:
+        - name: DB_HOST
+          value: "librenms-mysql"
+        - name: DB_NAME
+          value: "librenms"
+        - name: DB_USER
+          value: "librenms"
+        - name: DB_PASS
+          value: "librenms"
+        - name: BASE_URL
+          value: "/"
+        - name: TZ
+          value: "UTC"
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: librenms-admin-user
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: librenms-admin-user
+              key: password
+        - name: EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: librenms-admin-user
+              key: email
+        command:
+        - su
+        - "-p"
+        - "librenms"
+        - "-c"
+        - "cd /opt/librenms && php /opt/librenms/build-base.php && php /opt/librenms/adduser.php ${USERNAME} ${PASSWORD} 10 ${EMAIL}"
+      containers:
+      - name: librenms
+        image: jarischaefer/docker-librenms:1.43
+        env:
+        - name: DB_HOST
+          value: "librenms-mysql"
+        - name: DB_NAME
+          value: "librenms"
+        - name: DB_USER
+          value: "librenms"
+        - name: DB_PASS
+          value: "librenms"
+        - name: BASE_URL
+          value: "/"
+        - name: TZ
+          value: "Australia/Melbourne"
+        - name: SNMP_SCAN_ENABLE
+          value: "true"
+        - name: DISCOVERY_THREADS
+          value: "2"
+        - name: SNMP_SCAN_CRON
+          value: "0 */30 * ? * *" # every 30mins
+        ports:
+        - name: librenms-http
+          containerPort: 80
+        # - name: librenms-https
+          # containerPort: 443
+        volumeMounts:
+        - name: librenms-logs
+          mountPath: /opt/librenms/logs
+        - name: librenms-rrd
+          mountPath: /opt/librenms/rrd
+        # - name: libressl
+          # mountPath: /etc/nginx/ssl
+        - mountPath: /opt/librenms/conf.d
+          name: librenms-conf
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        readinessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+      volumes:
+        - name: librenms-conf
+          configMap:
+            name: librenms-conf
+            items:
+            - key: config-interfaces-php
+              path: interfaces.php
+            - key: config-influx-php
+              path: influx.php
+  volumeClaimTemplates:
+  - metadata:
+      name: librenms-logs
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+  - metadata:
+      name: librenms-rrd
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+  # - metadata:
+      # name: libressl
+    # spec:
+      # accessModes: ["ReadWriteOnce"]
+      # resources:
+        # requests:
+          # storage: 1Gi

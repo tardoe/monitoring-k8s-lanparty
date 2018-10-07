@@ -1,0 +1,75 @@
+## Default values.yaml for Telegraf
+## This is a YAML-formatted file.
+## ref: https://hub.docker.com/r/library/telegraf/tags/
+image:
+  repo: "telegraf"
+  tag: "1.7.4-alpine"
+  pullPolicy: IfNotPresent
+          
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 0.1
+  limits:
+    memory: 2Gi
+    cpu: 1
+    
+## Configure the service for this telegraf instance. If you are running
+## Any of the service plugins you will need this enabled
+## Service Plugins: http_listener, statsd, tcp_listener, udp_listener
+## ref: http://kubernetes.io/docs/user-guide/services/
+service:
+  enabled: true
+  type: ClusterIP
+  
+## Exposed telegraf configuration
+## For full list of possible values see `/docs/all-config-values.yaml` and `/docs/all-config-values.toml`
+## ref: https://docs.influxdata.com/telegraf/v1.7/administration/configuration/
+
+config:
+##    global_tags:
+##      dc: "us-east-1"
+##      user: "$USER"
+  agent:
+    interval: "10s"
+    round_interval: true
+    metric_batch_size: 1000
+    metric_buffer_limit: 10000
+    collection_jitter: "0s"
+    flush_interval: "10s"
+    flush_jitter: "0s"
+    precision: ""
+    debug: false
+    quiet: false
+    logfile: ""
+    hostname: "telegraf-polling-service"
+    omit_hostname: false
+  outputs:
+    influxdb:
+      urls:
+        - "http://kube-influxdb-influxdb:8086"
+      database: "metrics"
+  inputs:
+    dns_query:
+      servers: 
+        - "8.8.8.8"
+        - "1.1.1.1"
+      domains: 
+        - "."
+      record_type: "A"
+      port: 53
+      timeout: 2
+    net_response:
+      protocol: "tcp"
+      address: "github.com:80"
+      timeout: "1s"
+      send: "ssh"
+      expect: "ssh"
+      read_timeout: "1s"
+    ping:
+      urls: 
+        - "www.google.com"
+        - "www.timraphael.com"
+      count: 5
