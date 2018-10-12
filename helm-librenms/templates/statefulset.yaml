@@ -114,6 +114,7 @@ spec:
       name: librenms-logs
     spec:
       accessModes: ["ReadWriteOnce"]
+      storageClassName: "librenms-logs-storage"
       resources:
         requests:
           storage: 2Gi
@@ -121,6 +122,7 @@ spec:
       name: librenms-rrd
     spec:
       accessModes: ["ReadWriteOnce"]
+      storageClassName: "librenms-rrd-storage"
       resources:
         requests:
           storage: 2Gi
