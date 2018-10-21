@@ -51,7 +51,7 @@ replicaset.apps/prometheus-operator-d75587d6   1         1         1         1m
 ### Deploy Prometheus Chart
 Next is the kube-prometheus deployment which will actually do the work for it. This will setup a full Prometheus stack including node exporters for each worker, kubelet monitors and service checks for the K8s stack.
 ```
-user@master$ helm install coreos/kube-prometheus --name kube-prometheus --set global.rbacEnable=false --namespace monitoring
+user@master$ helm install coreos/kube-prometheus --name kube-prometheus --namespace monitoring
 ```
 
 Once again, this should create a bunch of resources including daemon sets for node exporters.

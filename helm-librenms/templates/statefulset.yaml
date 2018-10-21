@@ -15,7 +15,7 @@ spec:
     spec:
       initContainers:
       - name: init-librenmsdb
-        image: jarischaefer/docker-librenms:1.43
+        image:  tardoe/docker-librenms-1min:latest
         env:
         - name: DB_HOST
           value: "librenms-mysql"
@@ -52,7 +52,7 @@ spec:
         - "cd /opt/librenms && php /opt/librenms/build-base.php && php /opt/librenms/adduser.php ${USERNAME} ${PASSWORD} 10 ${EMAIL}"
       containers:
       - name: librenms
-        image: jarischaefer/docker-librenms:1.43
+        image: tardoe/docker-librenms-1min:latest
         env:
         - name: DB_HOST
           value: "librenms-mysql"

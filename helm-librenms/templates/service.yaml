@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   type: {{ .Values.librenms.service.type }}
+  clusterIP: None
   ports:
     - port: {{ .Values.librenms.service.port }}
       targetPort: 80
