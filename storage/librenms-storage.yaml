@@ -38,7 +38,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - k8s-worker
+          - kubeworker3
   persistentVolumeReclaimPolicy: Retain
   storageClassName: librenms-logs-storage
 ---
@@ -60,7 +60,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - k8s-worker
+          - kubeworker3
   persistentVolumeReclaimPolicy: Retain
   storageClassName: librenms-rrd-storage
 ---
@@ -82,6 +82,6 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - k8s-worker
+          - kubeworker3
   persistentVolumeReclaimPolicy: Retain
   storageClassName: librenms-mysql-storage

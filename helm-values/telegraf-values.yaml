@@ -21,7 +21,7 @@ resources:
 ## Service Plugins: http_listener, statsd, tcp_listener, udp_listener
 ## ref: http://kubernetes.io/docs/user-guide/services/
 service:
-  enabled: true
+  enabled: false
   type: ClusterIP
   
 ## Exposed telegraf configuration
@@ -47,29 +47,29 @@ config:
     hostname: "telegraf-polling-service"
     omit_hostname: false
   outputs:
-    influxdb:
+   - influxdb:
       urls:
-        - "http://kube-influxdb-influxdb:8086"
+        - "http://influxdb-influxdb:8086"
       database: "metrics"
   inputs:
-    dns_query:
-      servers: 
-        - "8.8.8.8"
-        - "1.1.1.1"
-      domains: 
-        - "."
-      record_type: "A"
-      port: 53
-      timeout: 2
-    net_response:
-      protocol: "tcp"
-      address: "github.com:80"
-      timeout: "1s"
-      send: "ssh"
-      expect: "ssh"
-      read_timeout: "1s"
-    ping:
-      urls: 
-        - "www.google.com"
-        - "www.timraphael.com"
-      count: 5
+    - dns_query:
+        servers: 
+          - "8.8.8.8"
+          - "1.1.1.1"
+        domains: 
+          - "www.google.com"
+        record_type: "A"
+        port: 53
+        timeout: 2
+    - net_response:
+        protocol: "tcp"
+        address: "github.com:80"
+        timeout: "1s"
+        send: "ssh"
+        expect: "ssh"
+        read_timeout: "1s"
+    - ping:
+        urls: 
+          - "www.google.com"
+          - "www.timraphael.com"
+        count: 5

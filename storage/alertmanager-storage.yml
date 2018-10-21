@@ -24,6 +24,6 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - k8s-worker
+          - kubeworker3
   persistentVolumeReclaimPolicy: Retain
   storageClassName: alertmanager-storage
